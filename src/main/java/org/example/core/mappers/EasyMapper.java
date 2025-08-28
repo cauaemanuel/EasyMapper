@@ -45,11 +45,20 @@ public class EasyMapper {
     public <E, D> E toEntity(D dto, Class<E> entityClass){
         try{
             var entityNewInstance = entityClass.getDeclaredConstructor().newInstance();
-            for (Field fieldEntity: entityClass.getDeclaredFields()){
+            for (Field fieldDTO: dto.getClass().getDeclaredFields()){
+                var annotation = fieldDTO.getAnnotation(MapField.class);
+
+                if(annotation != null && !annotation.nameField().isEmpty()){
+                    Field fieldEntity = entityClass.getDeclaredField(annotation.nameField());
+                    fieldEntity.setAccessible(true);
+                    fieldDTO.setAccessible(true);
+                    fieldEntity.set(entityNewInstance, fieldDTO.get(dto));
+                    continue;
+                }
+                fieldDTO.setAccessible(true);
+                Field fieldEntity = entityClass.getDeclaredField(fieldDTO.getName());
                 fieldEntity.setAccessible(true);
-                Field fieldDto = dto.getClass().getDeclaredField(fieldEntity.getName());
-                fieldDto.setAccessible(true);
-                fieldEntity.set(entityNewInstance, fieldDto.get(dto));
+                fieldEntity.set(entityNewInstance, fieldDTO.get(dto));
             }
             return entityNewInstance;
         } catch (Exception e) {
