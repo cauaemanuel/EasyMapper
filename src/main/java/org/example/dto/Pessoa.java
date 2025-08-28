@@ -5,6 +5,15 @@ import org.example.annotations.MapField;
 public class Pessoa {
 
     private String nome;
+    private Integer idade;
+
+    public Integer getIdade() {
+        return idade;
+    }
+
+    public void setIdade(Integer idade) {
+        this.idade = idade;
+    }
 
     public String getNome() {
         return nome;

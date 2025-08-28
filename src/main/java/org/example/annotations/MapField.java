@@ -8,6 +8,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface MapField {
-    boolean ignore() default false;
-    String name() default "";
+    String nameField() default "";
 }
