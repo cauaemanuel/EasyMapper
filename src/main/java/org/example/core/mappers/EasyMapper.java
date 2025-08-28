@@ -1,5 +1,6 @@
 package org.example.core.mappers;
 
+import org.example.annotations.MapField;
 import org.example.core.ignores.IgnoreParam;
 
 import java.lang.reflect.Field;
@@ -43,14 +44,14 @@ public class EasyMapper {
 
     public <E, D> E toEntity(D dto, Class<E> entityClass){
         try{
-            var entityInstance = entityClass.getDeclaredConstructor().newInstance();
+            var entityNewInstance = entityClass.getDeclaredConstructor().newInstance();
             for (Field fieldEntity: entityClass.getDeclaredFields()){
                 fieldEntity.setAccessible(true);
                 Field fieldDto = dto.getClass().getDeclaredField(fieldEntity.getName());
                 fieldDto.setAccessible(true);
-                fieldEntity.set(entityInstance, fieldDto.get(dto));
+                fieldEntity.set(entityNewInstance, fieldDto.get(dto));
             }
-            return entityInstance;
+            return entityNewInstance;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -58,19 +59,36 @@ public class EasyMapper {
 
     public <E, D> E toEntity(D dto, Class<E> entityClass, List<IgnoreParam> ignoreParams){
         try{
-            var entityInstance = entityClass.getDeclaredConstructor().newInstance();
-            for (Field fieldEntity: entityClass.getDeclaredFields()){
-                if(ignoreParams.stream().anyMatch(ignoreParam -> ignoreParam.getFieldName().equals(fieldEntity.getName()))){
+            var entityNewInstance = entityClass.getDeclaredConstructor().newInstance();
+
+            for (Field fieldDTO: dto.getClass().getDeclaredFields()){
+                var annotation = fieldDTO.getAnnotation(MapField.class);
+
+                if(annotation != null && !annotation.nameField().isEmpty()){
+                    Field fieldEntity = entityClass.getDeclaredField(annotation.nameField());
+                    if(ignoreField(fieldEntity.getName(), ignoreParams)){
+                        continue;
+                    }
+                    fieldEntity.setAccessible(true);
+                    fieldDTO.setAccessible(true);
+                    fieldEntity.set(entityNewInstance, fieldDTO.get(dto));
                     continue;
                 }
+                if(ignoreField(fieldDTO.getName(), ignoreParams)){
+                    continue;
+                }
+                fieldDTO.setAccessible(true);
+                Field fieldEntity = entityClass.getDeclaredField(fieldDTO.getName());
                 fieldEntity.setAccessible(true);
-                Field fieldDto = dto.getClass().getDeclaredField(fieldEntity.getName());
-                fieldDto.setAccessible(true);
-                fieldEntity.set(entityInstance, fieldDto.get(dto));
+                fieldEntity.set(entityNewInstance, fieldDTO.get(dto));
             }
-            return entityInstance;
+            return entityNewInstance;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean ignoreField(String fieldName, List<IgnoreParam> ignoreParams){
+        return ignoreParams.stream().anyMatch(ignoreParam -> ignoreParam.getFieldName().equals(fieldName));
     }
 }

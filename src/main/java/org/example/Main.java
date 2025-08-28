@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.core.ignores.IgnoreParam;
 import org.example.core.mappers.EasyMapper;
+import org.example.dto.Pessoa;
 
 import java.util.List;
 
@@ -11,12 +12,14 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Hello and welcome!");
         var easy = new EasyMapper();
-        var pessoa = new org.example.dto.Pessoa();
-        pessoa.setNome("João");
-        pessoa.setIdade(10);
+        var pessoaDTO = new org.example.dto.PessoaDTO();
+        pessoaDTO.setNome("João");
+        pessoaDTO.setIdadeMaior(10);
+
+        var ignores = new IgnoreParam("nome");
 
 
-        var dto = easy.toDto(pessoa, org.example.dto.PessoaDTO.class);
+        var dto = easy.toEntity(pessoaDTO, Pessoa.class, List.of(ignores));
         System.out.println(dto.toString());
     }
 }

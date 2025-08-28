@@ -5,6 +5,8 @@ import org.example.annotations.MapField;
 public class PessoaDTO {
 
     private String nome;
+
+    @MapField(nameField = "idade")
     private Integer idadeMaior;
 
     public Integer getIdadeMaior() {
