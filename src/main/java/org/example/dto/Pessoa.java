@@ -1,5 +1,7 @@
 package org.example.dto;
 
+import org.example.annotations.MapField;
+
 public class Pessoa {
 
     private String nome;
