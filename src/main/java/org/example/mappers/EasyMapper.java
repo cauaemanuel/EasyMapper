@@ -20,6 +20,19 @@ public class EasyMapper {
         }
     }
 
-
+    public <E, D> E toEntity(D dto, Class<E> entityClass){
+        try{
+            var entityInstance = entityClass.getDeclaredConstructor().newInstance();
+            for (Field fieldEntity: entityClass.getDeclaredFields()){
+                fieldEntity.setAccessible(true);
+                Field fieldDto = dto.getClass().getDeclaredField(fieldEntity.getName());
+                fieldDto.setAccessible(true);
+                fieldEntity.set(entityInstance, fieldDto.get(dto));
+            }
+            return entityInstance;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
