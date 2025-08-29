@@ -1,25 +1,25 @@
 package org.example;
 
-import org.example.core.ignores.IgnoreParam;
-import org.example.core.mappers.EasyMapper;
+import org.example.core.mappers.GenericMapper;
+import org.example.dto.PessoaDTO;
 import org.example.dto.Pessoa;
 
-import java.util.List;
-
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello and welcome!");
-        var easy = new EasyMapper();
-        var pessoaDTO = new org.example.dto.PessoaDTO();
+        var mapper = new GenericMapper();
+
+        // DTO para Entity
+        var pessoaDTO = new PessoaDTO();
         pessoaDTO.setNome("João");
         pessoaDTO.setIdadeMaior(10);
+        var pessoa = mapper.mapper(pessoaDTO, Pessoa.class);
+        System.out.println("DTO para Entity: " + pessoa);
 
-        var ignores = new IgnoreParam("nome");
-
-
-        var dto = easy.toEntity(pessoaDTO, Pessoa.class, List.of(ignores));
-        System.out.println(dto.toString());
+        // Entity para DTO
+        var pessoaEntity = new Pessoa();
+        pessoaEntity.setNome("Maria");
+        pessoaEntity.setIdade(25);
+        var pessoaDTOConvertida = mapper.mapper(pessoaEntity, PessoaDTO.class);
+        System.out.println("Entity para DTO: " + pessoaDTOConvertida);
     }
 }
